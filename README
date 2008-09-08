@@ -1,0 +1,12 @@
+Paradigms of Artificial Intelligence Programming (in Ruby)
+----------------------------------------------------------
+
+This code is a port of the Lisp code found in the book Paradigms of
+Artificial Intelligence Programming, written by Peter Norvig. The
+purpose is to show some older AI programs implemented in idiomatic
+Ruby.
+
+The original code was all written by Peter Norvig, and the copyright
+belongs to him.
+
+This port is licensed under the MIT license.
