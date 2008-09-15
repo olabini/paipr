@@ -13,7 +13,9 @@ end
 
 class GPS::Op
   def convert!
-    unless self.add_list.any? { |l| l.is_a?(Array) && l.first == :executing } 
+    unless self.add_list.any? do |l| 
+        l.is_a?(Array) && l.first == :executing 
+      end
       self.add_list << [:executing, self.action]
     end
     self
@@ -33,7 +35,7 @@ class GPS2 < GPS
              parts[:del_list]).convert!
     end
   end
-  
+
   def solve(*goals)
     achieve_all([[:start]] + @state, goals, []).grep(Array)
   end
