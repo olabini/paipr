@@ -53,15 +53,15 @@ end
 
 module Eliza
   class << self
-    def run
+    def run(rules = Rule::ELIZA_RULES)
       while true
         print "eliza> "
-        puts eliza_rule(gets.split)
+        puts eliza_rule(gets.downcase.split, rules)
       end
     end
     
-    def eliza_rule(input)
-      Rule::ELIZA_RULES.some? do |rule|
+    def eliza_rule(input, rules)
+      rules.some? do |rule|
         result = rule.pattern.match(input)
         if result
           switch_viewpoint(result).inject(rule.responses.random_elt) do |sum, repl|
@@ -87,4 +87,6 @@ module Eliza
   end
 end
 
-Eliza.run
+if __FILE__ == $0
+  Eliza.run
+end
