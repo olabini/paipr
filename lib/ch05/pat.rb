@@ -2,7 +2,9 @@ require 'enumerator'
 
 class Pattern
   def initialize(pattern)
-    @pattern = pattern
+    @pattern = pattern.map do |p| 
+      variable?(p) ? p : p.downcase
+    end
   end
   
   # Does pattern match input? Any variable can match anything
