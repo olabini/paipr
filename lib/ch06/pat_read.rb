@@ -18,7 +18,7 @@ class Pattern
           result << f[0][1..-2].split
         end
       end
-      result
+      Pattern.new result
     end
   end
 end
