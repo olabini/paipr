@@ -56,7 +56,9 @@ class City
   end
 
   def deg_to_radians(deg)
-    (deg.truncate + ((deg%1) * (100.0/60.0))) * Math::PI * 1.0/180.0
+    (deg.truncate + ((deg%1) * (100.0/60.0))) * 
+      Math::PI * 
+      1.0/180.0
   end
   
   def neighbors

@@ -164,12 +164,17 @@ class Pattern
   }
 end
 
-require 'pat_read'
-p Pattern.from_string("a (?* ?x) d").match(%w(a b c d))
-p Pattern.from_string("a (?* ?x) (?* ?y) d").match(%w(a b c d))
-p Pattern.from_string("a (?* ?x) (?* ?y) ?x ?y").match(['a', 'b', 'c', 'd', ['b', 'c'], ['d']])
+if __FILE__ == $0
+  require 'pat_read'
+  p Pattern.from_string("a (?* ?x) d").
+    match(%w(a b c d))
+  p Pattern.from_string("a (?* ?x) (?* ?y) d").
+    match(%w(a b c d))
+  p Pattern.from_string("a (?* ?x) (?* ?y) ?x ?y").
+    match(['a', 'b', 'c', 'd', ['b', 'c'], ['d']])
 
-Pattern.match_abbrev :"?x*", %w(?* ?x)
-Pattern.match_abbrev :"?y*", %w(?* ?y)
+  Pattern.match_abbrev :"?x*", %w(?* ?x)
+  Pattern.match_abbrev :"?y*", %w(?* ?y)
 
-p Pattern.from_string("a ?x* b")
+  p Pattern.from_string("a ?x* b")
+end

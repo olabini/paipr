@@ -13,13 +13,16 @@ module Search
 
       return [] if paths.empty?
       return [paths.first, paths] if goal_p[paths.first.state]
+
       path = paths.shift
       state = path.state
       old_paths = insert_path(path, old_paths)
+
       successors[state].each do |state2|
         cost = path.cost_so_far + cost_fn[state, state2]
         cost2 = cost_left_fn[state2]
         path2 = Path.new(state2, path, cost, cost+cost2)
+
         old = find_path(state2, paths, state_eq)
         if old
           if better_path(path2, old)
@@ -37,7 +40,13 @@ module Search
           end
         end
       end
-      a_star(paths, successors, cost_fn, cost_left_fn, state_eq, old_paths, &goal_p)
+      a_star(paths, 
+             successors, 
+             cost_fn, 
+             cost_left_fn, 
+             state_eq, 
+             old_paths, 
+             &goal_p)
     end
     
     def find_path(state, paths, state_eq)

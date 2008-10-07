@@ -11,7 +11,10 @@ module Search
       dbg :search, ";; Search: %p", states
       return nil if states.empty?
       return states.first if goal_p[states.first]
-      graph(combiner[new_states(states,successors,state_eq,old_states),
+      graph(combiner[new_states(states,
+                                successors,
+                                state_eq,
+                                old_states),
                     states[1..-1]],
             successors,
             combiner,
