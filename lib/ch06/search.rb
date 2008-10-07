@@ -38,6 +38,12 @@ module Trees
     def binary(x)
       [2*x, 2*x + 1]
     end
+
+    def finite_binary(n)
+      proc do |x|
+        binary(x).select { |child| child<=n }
+      end
+    end
   end
 end
 
