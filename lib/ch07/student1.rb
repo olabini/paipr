@@ -24,45 +24,45 @@ class Rule
   STUDENT_RULES = 
     [
      ["?x* .",                         "?x"],
-     ["?x* . ?y*",             "?x ?y"],
-     ["if ?x* , then ?y*",     "?x ?y"],
-     ["if ?x* then ?y*",       "?x ?y"],
-     ["if ?x* , ?y*",          "?x ?y"],
-     ["?x* , and ?y*",         "?x ?y"],
-     ["find ?x* and ?y*",      ["to_find_1 == ?x", "to_find_2 == ?y"]],
-     ["find ?x*",              "to_find == ?x"],
-     ["?x* equals ?y*",        "?x == ?y"],
-     ["?x* same as ?y*",       "?x == ?y"],
-     ["?x* = ?y*",             "?x == ?y"],
-     ["?x* is equal to ?y*",   "?x == ?y"],
-     ["?x* is ?y*",            "?x == ?y"],
-     ["?x* - ?y*",             "?x - ?y"],
-     ["?x* minus ?y*",         "?x - ?y"],
-     ["difference between ?x* and ?y*", "?x - ?y"],
-     ["difference ?x* and ?y*",         "?x - ?y"],
-     ["?x* + ?y*",             "?x + ?y"],
-     ["?x* plus ?y*",          "?x + ?y"],
-     ["sum ?x* and ?y*",       "?x + ?y"],
-     ["product ?x* and ?y*",   "?x * ?y"],
-     ["?x* * ?y*",             "?x * ?y"],
-     ["?x* times ?y*",         "?x * ?y"],
-     ["?x* / ?y*",             "?x / ?y"],
-     ["?x* per ?y*",           "?x / ?y"],
-     ["?x* divided by ?y*",    "?x / ?y"],
-     ["half ?x*",              "?x / ?y"],
-     ["one half ?x*",          "?x / ?y"],
-     ["twice ?x*",             "2 * ?x"],
-     ["square ?x*",            "?x * ?x"],
-     ["?x* % less than ?y*",   ["?y", "*", [["100 - ?x"], "/", "100"]]],
-     ["?x* % more than ?y*",   ["?y", "*", [["100 + ?x"], "/", "100"]]],
-     ["?x* % ?y*",             ["?x / 100", "*", "?y"]]
+     ["?x* . ?y*",                     "?x ?y"],
+     ["if ?x* , then ?y*",             "?x ?y"],
+     ["if ?x* then ?y*",               "?x ?y"],
+     ["if ?x* , ?y*",                  "?x ?y"],
+     ["?x* , and ?y*",                 "?x ?y"],
+     ["find ?x* and ?y*",             ["to_find_1 == ?x", "to_find_2 == ?y"]],
+     ["find ?x*",                      "to_find == ?x"],
+     ["?x* equals ?y*",                "?x == ?y"],
+     ["?x* same as ?y*",               "?x == ?y"],
+     ["?x* = ?y*",                     "?x == ?y"],
+     ["?x* is equal to ?y*",           "?x == ?y"],
+     ["?x* is ?y*",                    "?x == ?y"],
+     ["?x* - ?y*",                     "?x - ?y"],
+     ["?x* minus ?y*",                 "?x - ?y"],
+     ["difference between ?x* and ?y*","?x - ?y"],
+     ["difference ?x* and ?y*",        "?x - ?y"],
+     ["?x* + ?y*",                     "?x + ?y"],
+     ["?x* plus ?y*",                  "?x + ?y"],
+     ["sum ?x* and ?y*",               "?x + ?y"],
+     ["product ?x* and ?y*",           "?x * ?y"],
+     ["?x* * ?y*",                     "?x * ?y"],
+     ["?x* times ?y*",                 "?x * ?y"],
+     ["?x* / ?y*",                     "?x / ?y"],
+     ["?x* per ?y*",                   "?x / ?y"],
+     ["?x* divided by ?y*",            "?x / ?y"],
+     ["half ?x*",                      "?x / ?y"],
+     ["one half ?x*",                  "?x / ?y"],
+     ["twice ?x*",                     "2 * ?x"],
+     ["square ?x*",                    "?x * ?x"],
+     ["?x* % less than ?y*",          ["?y", "*", [["100 - ?x"], "/", "100"]]],
+     ["?x* % more than ?y*",          ["?y", "*", [["100 + ?x"], "/", "100"]]],
+     ["?x* % ?y*",                    ["?x / 100", "*", "?y"]]
     ].map{ |s| [Pattern.from_string(s[0]), split(s[1])]}
 end
 
 module Student
   class << self
     def solve(words)
-    solve_equations(
+      solve_equations(
         create_list_of_equations(
           translate_to_expression(
             words.find_all do |word|
@@ -85,6 +85,18 @@ module Student
                               response.map(&recproc)
                             }) ||
         make_variable(words)
+    end
+
+    def create_list_of_equations(exp)
+      case 
+      when exp.empty?
+        []
+      when !exp[0].is_a?(Array)
+        [exp]
+      else
+        create_list_of_equations(exp[0]) +
+          create_list_of_equations(exp[1..-1])
+      end
     end
     
     def make_variable(words)
