@@ -11,6 +11,16 @@ Pattern.match_abbrev(:"?x*", %w(?* ?x))
 Pattern.match_abbrev(:"?y*", %w(?* ?y))
 
 class Rule
+  def self.split(obj)
+    case obj
+    when String
+      o = obj.split
+      o.length == 1 ? o[0] : o
+    when Array
+      obj.map { |x| split(x) }
+    end
+  end
+  
   STUDENT_RULES = 
     [
      ["?x* .",                         "?x"],
@@ -19,13 +29,13 @@ class Rule
      ["if ?x* then ?y*",       "?x ?y"],
      ["if ?x* , ?y*",          "?x ?y"],
      ["?x* , and ?y*",         "?x ?y"],
-     ["find ?x* and ?y*",      "(to_find_1 == ?x) (to_find_2 == ?y)"],
+     ["find ?x* and ?y*",      ["to_find_1 == ?x", "to_find_2 == ?y"]],
      ["find ?x*",              "to_find == ?x"],
-     ["?x* equals ?y*",        "to_find == ?x"],
-     ["?x* same as ?y*",       "to_find == ?x"],
-     ["?x* = ?y*",             "to_find == ?x"],
-     ["?x* is equal to ?y*",   "to_find == ?x"],
-     ["?x* is ?y*",            "to_find == ?x"],
+     ["?x* equals ?y*",        "?x == ?y"],
+     ["?x* same as ?y*",       "?x == ?y"],
+     ["?x* = ?y*",             "?x == ?y"],
+     ["?x* is equal to ?y*",   "?x == ?y"],
+     ["?x* is ?y*",            "?x == ?y"],
      ["?x* - ?y*",             "?x - ?y"],
      ["?x* minus ?y*",         "?x - ?y"],
      ["difference between ?x* and ?y*", "?x - ?y"],
@@ -43,16 +53,16 @@ class Rule
      ["one half ?x*",          "?x / ?y"],
      ["twice ?x*",             "2 * ?x"],
      ["square ?x*",            "?x * ?x"],
-     ["?x* % less than ?y*",   "?y * ((100 - ?x) / 100)"],
-     ["?x* % more than ?y*",   "?y * ((100 + ?x) / 100)"],
-     ["?x* % ?y*",             "(?x / 100) * ?y"]
-    ].map{ |s| x=[Pattern.from_string(s[0]), s[1]]; p x; x }
+     ["?x* % less than ?y*",   ["?y", "*", [["100 - ?x"], "/", "100"]]],
+     ["?x* % more than ?y*",   ["?y", "*", [["100 + ?x"], "/", "100"]]],
+     ["?x* % ?y*",             ["?x / 100", "*", "?y"]]
+    ].map{ |s| [Pattern.from_string(s[0]), split(s[1])]}
 end
 
 module Student
   class << self
     def solve(words)
-      solve_equations(
+    solve_equations(
         create_list_of_equations(
           translate_to_expression(
             words.find_all do |word|
@@ -65,12 +75,33 @@ module Student
     end
     
     def translate_to_expression(words)
-      p(Rule::STUDENT_RULES.some? do |pattern, replace|
-        result = pattern.match(words)
+      rule_based_translator(words, 
+                            Rule::STUDENT_RULES,
+                            :rule_if => lambda{|obj| obj[0]},
+                            :rule_then => lambda{|obj| obj[1]},
+                            :action => lambda{|bindings, response|
+                              res = bindings.inject({}){|sum, vals| xx = translate_pair(vals[0], vals[1]); sum[xx[0]] = xx[1]; sum}
+                              recproc = proc{ |x| x.is_a?(Array) ? x.map(&recproc) : (res[x] || x) }
+                              response.map(&recproc)
+                            }) ||
+        make_variable(words)
+    end
+    
+    def make_variable(words)
+      words.first
+    end
+    
+    def rule_based_translator(input, rules, options={})
+      rules.some? do |rule|
+        result = options[:rule_if][rule].match(input)
         if result
-          [result, replace]
+          options[:action][result, options[:rule_then][rule]]
         end
-      end)
+      end
+    end
+    
+    def translate_pair(first, second)
+      [first, translate_to_expression(second)]
     end
   end
 end
@@ -78,7 +109,6 @@ end
 
 if __FILE__ == $0
   require 'pp'
-  pp Rule::STUDENT_RULES
 
-  Student.solve(%w(If the number of customers Tom gets is twice the square of 20 % of the number of advertisements he runs , and the number of advertisements is 45 , then what is the number of customers Tom gets ?))
+  Student.solve(%w(If the number of customers Tom gets is twice the square of 20 % of the number of advertisements he runs , and the number of advertisements is 45 , then what is the number of customers Tom gets ?).map{ |w| w.downcase })
 end
